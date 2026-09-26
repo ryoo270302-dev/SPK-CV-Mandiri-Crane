@@ -1,0 +1,21 @@
+body {
+    background-color: #f4f6f9;
+}
+.table-matrix th, .table-matrix td {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.card-stat {
+    border-left: 4px solid #0d6efd;
+}
+.badge-cr-ok { background-color: #198754; }
+.badge-cr-bad { background-color: #dc3545; }
+.rank-1 { font-weight: 700; color: #198754; }
+.small-muted { font-size: 0.85rem; color: #6c757d; }
+
+@media print {
+    .no-print { display: none !important; }
+    body { background: #fff; }
+    .container-fluid { width: 100%; max-width: 100%; }
+}
