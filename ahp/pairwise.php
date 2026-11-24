@@ -19,27 +19,21 @@ $n = count($criteria);
 $missing = Score::findMissing($cranes, $criteria);
 $canRun = $n >= 2 && count($cranes) >= 2 && empty($missing);
 
-/** Saaty scale options: label => decimal value (as string, parsed below) */
+/** Pilihan skala Saaty untuk dropdown (nilai = teks, di-parse oleh parseSaaty). */
 function saatyOptions(): array
 {
+    return ['1', '2', '3', '4', '5', '6', '7', '8', '9', '1/2', '1/3', '1/4', '1/5', '1/6', '1/7', '1/8', '1/9'];
+}
+
+/** Arti skala Saaty untuk kartu instruksi: nilai => keterangan. */
+function saatyMeaning(): array
+{
     return [
-        '9' => '9 - Mutlak lebih penting',
-        '8' => '8 - Nilai tengah (7 dan 9)',
-        '7' => '7 - Sangat lebih penting',
-        '6' => '6 - Nilai tengah (5 dan 7)',
-        '5' => '5 - Lebih penting',
-        '4' => '4 - Nilai tengah (3 dan 5)',
-        '3' => '3 - Sedikit lebih penting',
-        '2' => '2 - Nilai tengah (1 dan 3)',
-        '1' => '1 - Sama penting',
-        '1/2' => '1/2 - Nilai tengah (1 dan 1/3)',
-        '1/3' => '1/3 - Sedikit kurang penting',
-        '1/4' => '1/4 - Nilai tengah (1/3 dan 1/5)',
-        '1/5' => '1/5 - Kurang penting',
-        '1/6' => '1/6 - Nilai tengah (1/5 dan 1/7)',
-        '1/7' => '1/7 - Sangat kurang penting',
-        '1/8' => '1/8 - Nilai tengah (1/7 dan 1/9)',
-        '1/9' => '1/9 - Mutlak kurang penting',
+        '1' => 'Sama penting',
+        '3' => 'Sedikit lebih penting',
+        '5' => 'Lebih penting',
+        '7' => 'Sangat lebih penting',
+        '9' => 'Mutlak lebih penting',
     ];
 }
 
@@ -152,6 +146,29 @@ require __DIR__ . '/../views/layout/header.php';
   <div class="alert alert-danger"><?php foreach ($errors as $e): ?><p class="mb-0"><?= htmlspecialchars($e) ?></p><?php endforeach; ?></div>
 <?php endif; ?>
 
+<?php
+  $exA = htmlspecialchars($criteria[0]['nama']);
+  $exB = htmlspecialchars($criteria[1]['nama']);
+?>
+<div class="card shadow-sm mb-3">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Instruksi Perbandingan</h5>
+    <p class="text-muted small mb-3">Bandingkan tingkat kepentingan setiap pasangan kriteria (baris terhadap kolom) menggunakan skala berikut:</p>
+    <ul class="list-unstyled mb-3">
+      <?php foreach (saatyMeaning() as $v => $ket): ?>
+        <li class="mb-1"><span class="pw-badge"><?= $v ?></span> <?= htmlspecialchars($ket) ?></li>
+      <?php endforeach; ?>
+    </ul>
+    <p class="small text-muted mb-2">Nilai 2, 4, 6, 8 adalah nilai tengah di antara dua nilai di atasnya.</p>
+    <p class="small mb-0">
+      Contoh: jika Anda menganggap <strong><?= $exA ?></strong> &ldquo;sedikit lebih penting&rdquo; daripada
+      <strong><?= $exB ?></strong>, pilih <strong>3</strong> pada sel yang sesuai. Jika sebaliknya
+      (<strong><?= $exB ?></strong> yang sedikit lebih penting), pilih <strong>1/3</strong>.
+      Sel di bawah diagonal terisi otomatis (kebalikannya).
+    </p>
+  </div>
+</div>
+
 <form method="post">
   <?= csrfField() ?>
   <div class="mb-3 col-md-5">
@@ -160,32 +177,67 @@ require __DIR__ . '/../views/layout/header.php';
   </div>
 
   <div class="card shadow-sm mb-3">
-    <div class="card-header">Isi nilai perbandingan tingkat kepentingan antar kriteria (skala Saaty 1-9)</div>
-    <div class="table-responsive">
-      <table class="table table-bordered mb-0 align-middle">
-        <thead class="table-light"><tr><th>Kriteria A</th><th>Kriteria B</th><th style="width:280px;">Perbandingan (A terhadap B)</th></tr></thead>
-        <tbody>
-        <?php for ($i = 0; $i < $n; $i++): for ($j = $i + 1; $j < $n; $j++): $key = $criteriaIds[$i] . '_' . $criteriaIds[$j]; ?>
-          <tr>
-            <td><?= htmlspecialchars($criteria[$i]['nama']) ?></td>
-            <td><?= htmlspecialchars($criteria[$j]['nama']) ?></td>
-            <td>
-              <?php $prev = $_POST['pair_' . $key] ?? '1'; ?>
-              <select name="pair_<?= $key ?>" class="form-select form-select-sm">
-                <?php foreach (saatyOptions() as $val => $label): ?>
-                  <option value="<?= $val ?>" <?= $val === $prev ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
-                <?php endforeach; ?>
-              </select>
-            </td>
-          </tr>
-        <?php endfor; endfor; ?>
-        </tbody>
-      </table>
+    <div class="card-body">
+      <h5 class="card-title mb-3">Matriks Perbandingan Berpasangan</h5>
+      <div class="table-responsive pw-wrap">
+        <table class="table table-bordered mb-0 align-middle pw-matrix">
+          <thead class="table-light">
+            <tr>
+              <th class="pw-head">KRITERIA</th>
+              <?php foreach ($criteria as $c): ?>
+                <th class="pw-head"><?= htmlspecialchars($c['kode']) ?> (<?= htmlspecialchars($c['nama']) ?>)</th>
+              <?php endforeach; ?>
+            </tr>
+          </thead>
+          <tbody>
+          <?php for ($i = 0; $i < $n; $i++): ?>
+            <tr>
+              <th scope="row" class="pw-rowhead"><?= htmlspecialchars($criteria[$i]['kode']) ?><br><?= htmlspecialchars($criteria[$i]['nama']) ?></th>
+              <?php for ($j = 0; $j < $n; $j++): ?>
+                <td>
+                  <?php if ($i === $j): ?>
+                    <input type="text" class="form-control form-control-sm pw-fixed" value="1" disabled aria-label="Diagonal">
+                  <?php elseif ($i < $j): $key = $criteriaIds[$i] . '_' . $criteriaIds[$j]; $prev = $_POST['pair_' . $key] ?? '1'; ?>
+                    <select name="pair_<?= $key ?>" class="form-select form-select-sm pw-select" data-key="<?= $key ?>"
+                            aria-label="<?= htmlspecialchars($criteria[$i]['nama'] . ' terhadap ' . $criteria[$j]['nama']) ?>">
+                      <?php foreach (saatyOptions() as $val): ?>
+                        <option value="<?= $val ?>" <?= $val === $prev ? 'selected' : '' ?>><?= $val ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  <?php else: $key = $criteriaIds[$j] . '_' . $criteriaIds[$i]; ?>
+                    <input type="text" class="form-control form-control-sm pw-fixed pw-recip" value="1.000" disabled
+                           data-for="<?= $key ?>" aria-label="Kebalikan otomatis">
+                  <?php endif; ?>
+                </td>
+              <?php endfor; ?>
+            </tr>
+          <?php endfor; ?>
+          </tbody>
+        </table>
+      </div>
+      <hr class="my-3">
+      <button type="submit" class="btn btn-primary">Hitung Bobot &amp; Rekomendasi</button>
+      <a href="<?= url('index.php') ?>" class="btn btn-outline-secondary">Kembali</a>
     </div>
   </div>
-
-  <button type="submit" class="btn btn-primary">Hitung AHP &amp; TOPSIS</button>
 </form>
+
+<script>
+(function () {
+  function parseSaaty(v) {
+    if (v.indexOf('/') !== -1) { var p = v.split('/'); return parseFloat(p[0]) / parseFloat(p[1]); }
+    return parseFloat(v);
+  }
+  function syncRecip(select) {
+    var target = document.querySelector('.pw-recip[data-for="' + select.dataset.key + '"]');
+    if (target) { target.value = (1 / parseSaaty(select.value)).toFixed(3); }
+  }
+  document.querySelectorAll('.pw-select').forEach(function (s) {
+    syncRecip(s);
+    s.addEventListener('change', function () { syncRecip(s); });
+  });
+})();
+</script>
 <?php endif; ?>
 
 <?php require __DIR__ . '/../views/layout/footer.php'; ?>
