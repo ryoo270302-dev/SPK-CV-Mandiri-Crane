@@ -185,7 +185,7 @@ try {
     foreach ($criteriaIds as $idx => $cid) {
         $weights[$cid] = $ahpCalc['weights'][$idx];
     }
-    // Sesi kuisioner hanya memuat 5 unit hasil kuisioner, walau unit lain (seed_crane_tambahan.php) ada di basis data
+    // Sesi kuisioner hanya memuat 5 unit hasil kuisioner, walau ada unit lain di basis data
     $craneList = array_values(array_filter(Crane::all(), fn($c) => isset($cranes[$c['kode']])));
     $scoreMatrix = Score::matrix();
 
