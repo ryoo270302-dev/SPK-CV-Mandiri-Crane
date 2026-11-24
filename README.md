@@ -36,7 +36,11 @@ Teknik Informatika, Universitas Pamulang).
    ```php
    define('BASE_URL', '/spk-crane');
    ```
-6. Buka `http://localhost/spk-crane/login.php` di peramban (Chrome/Edge/Firefox terbaru).
+6. Muat data hasil kuisioner penelitian (lihat bagian "Data Kuisioner" di bawah):
+   ```
+   C:\xampp\php\php.exe database\seed_kuisioner.php
+   ```
+7. Buka `http://localhost/spk-crane/login.php` di peramban (Chrome/Edge/Firefox terbaru).
 
 ### Menjalankan cepat tanpa Apache (opsional, untuk pengembangan)
 
@@ -46,6 +50,24 @@ php -S localhost:8000
 ```
 lalu buka `http://localhost:8000/login.php`. Cara ini tetap membutuhkan MySQL
 (dari XAMPP) yang sedang berjalan di `localhost:3306`.
+
+## Data Kuisioner
+
+`database/seed_kuisioner.php` memasukkan data kuisioner responden **Basuki**
+(Kepala Operasional Pool, diisi 7 November 2026) ke basis data:
+
+| Bagian kuisioner | Masuk ke | Isi |
+|---|---|---|
+| B | `cranes` | 5 unit crane (kapasitas, tahun, harga sewa, jangkauan) |
+| C + E1 | `scores` | 35 skor (5 crane x 7 kriteria). C5-C7 dari penilaian responden; C1-C4 dikonversi dari spesifikasi memakai rentang E1 yang sudah dikonfirmasi |
+| D | sesi perhitungan | 21 perbandingan berpasangan, lalu AHP + TOPSIS dijalankan otomatis |
+
+Skrip ini idempoten (aman diulang) dan memakai mesin hitung aplikasi sendiri.
+Usia alat dihitung dari tahun acuan 2026. Nama unit yang sudah ada di basis
+data tidak ditimpa.
+
+Hasil dengan data ini: CR = 0,0122 (konsisten); TOPSIS peringkat 1 = CR-03
+XCMG 80T (V = 0,7329), AHP peringkat 1 = CR-03 juga; Spearman = 0,9000.
 
 ## Akun Default
 

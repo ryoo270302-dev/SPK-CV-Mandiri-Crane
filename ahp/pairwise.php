@@ -24,13 +24,21 @@ function saatyOptions(): array
 {
     return [
         '9' => '9 - Mutlak lebih penting',
+        '8' => '8 - Nilai tengah (7 dan 9)',
         '7' => '7 - Sangat lebih penting',
+        '6' => '6 - Nilai tengah (5 dan 7)',
         '5' => '5 - Lebih penting',
+        '4' => '4 - Nilai tengah (3 dan 5)',
         '3' => '3 - Sedikit lebih penting',
+        '2' => '2 - Nilai tengah (1 dan 3)',
         '1' => '1 - Sama penting',
+        '1/2' => '1/2 - Nilai tengah (1 dan 1/3)',
         '1/3' => '1/3 - Sedikit kurang penting',
+        '1/4' => '1/4 - Nilai tengah (1/3 dan 1/5)',
         '1/5' => '1/5 - Kurang penting',
+        '1/6' => '1/6 - Nilai tengah (1/5 dan 1/7)',
         '1/7' => '1/7 - Sangat kurang penting',
+        '1/8' => '1/8 - Nilai tengah (1/7 dan 1/9)',
         '1/9' => '1/9 - Mutlak kurang penting',
     ];
 }
