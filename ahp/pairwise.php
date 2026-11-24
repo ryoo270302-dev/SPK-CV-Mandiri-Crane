@@ -30,9 +30,13 @@ function saatyMeaning(): array
 {
     return [
         '1' => 'Sama penting',
+        '2' => 'Nilai tengah antara 1 dan 3',
         '3' => 'Sedikit lebih penting',
+        '4' => 'Nilai tengah antara 3 dan 5',
         '5' => 'Lebih penting',
+        '6' => 'Nilai tengah antara 5 dan 7',
         '7' => 'Sangat lebih penting',
+        '8' => 'Nilai tengah antara 7 dan 9',
         '9' => 'Mutlak lebih penting',
     ];
 }
@@ -159,7 +163,7 @@ require __DIR__ . '/../views/layout/header.php';
         <li class="mb-1"><span class="pw-badge"><?= $v ?></span> <?= htmlspecialchars($ket) ?></li>
       <?php endforeach; ?>
     </ul>
-    <p class="small text-muted mb-2">Nilai 2, 4, 6, 8 adalah nilai tengah di antara dua nilai di atasnya.</p>
+    <p class="small text-muted mb-2">Bila kriteria pada <em>kolom</em> yang lebih penting, pilih kebalikannya (1/2, 1/3, ... 1/9).</p>
     <p class="small mb-0">
       Contoh: jika Anda menganggap <strong><?= $exA ?></strong> &ldquo;sedikit lebih penting&rdquo; daripada
       <strong><?= $exB ?></strong>, pilih <strong>3</strong> pada sel yang sesuai. Jika sebaliknya
