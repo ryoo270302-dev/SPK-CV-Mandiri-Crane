@@ -66,7 +66,20 @@ Skrip ini idempoten (aman diulang) dan memakai mesin hitung aplikasi sendiri.
 Usia alat dihitung dari tahun acuan 2026. Nama unit yang sudah ada di basis
 data tidak ditimpa.
 
-Hasil dengan data ini: CR = 0,0122 (konsisten); TOPSIS peringkat 1 = CR-03
+### Unit tambahan (27 unit dari `data_manajemen_crane.html`)
+
+`database/seed_crane_tambahan.php` menambahkan 27 unit lain. Kode di file
+sumber bentrok dengan 5 unit kuisioner, jadi unit kuisioner dipertahankan dan
+unit tambahan diberi kode **CR-06 s/d CR-32** (nomor sumber + 5). Skor C1-C4
+dikonversi dari spesifikasi dengan rentang E1; **skor C5-C7 adalah estimasi**
+(kondisi dari tahun, mobilitas dari jenis dan kapasitas, ketersediaan dari
+status) dan perlu diganti penilaian responden lewat menu Penilaian. Status
+"Terbatas"/"Sangat Terbatas" dicatat di keterangan dan tercermin pada C7.
+
+Urutan menjalankan: `seed_kuisioner.php` dulu, lalu `seed_crane_tambahan.php`.
+Sesi "Kuisioner Basuki" selalu hanya memuat 5 unit kuisioner.
+
+Hasil dengan data kuisioner: CR = 0,0122 (konsisten); TOPSIS peringkat 1 = CR-03
 XCMG 80T (V = 0,7329), AHP peringkat 1 = CR-03 juga; Spearman = 0,9000.
 
 ## Akun Default

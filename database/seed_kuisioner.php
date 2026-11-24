@@ -31,8 +31,9 @@ require_once __DIR__ . '/../services/ahp.php';
 require_once __DIR__ . '/../services/topsis.php';
 require_once __DIR__ . '/../services/comparison.php';
 
+require_once __DIR__ . '/seed_helpers.php';
+
 const NAMA_SESI = 'Kuisioner Basuki - 7 November 2026';
-const TAHUN_ACUAN = 2026; // tahun pengisian kuisioner; usia alat = TAHUN_ACUAN - tahun
 
 // ---------------------------------------------------------------------
 // Bagian B + keterangan Bagian C
@@ -65,26 +66,6 @@ $skorSubjektif = [
     'CR-04' => ['C5' => 4, 'C6' => 4, 'C7' => 5],
     'CR-05' => ['C5' => 5, 'C6' => 4, 'C7' => 4],
 ];
-
-// ---------------------------------------------------------------------
-// Bagian E1 (dikonfirmasi responden): batas atas tiap skor 1..4, skor 5 = di atasnya
-// ---------------------------------------------------------------------
-$rentang = [
-    'C1' => [20, 30, 45, 60],
-    'C2' => [2000000, 2500000, 3000000, 4000000],
-    'C3' => [20, 25, 30, 35],
-    'C4' => [2, 4, 6, 8],
-];
-
-function konversiSkor(float $nilai, array $batas): int
-{
-    foreach ($batas as $i => $b) {
-        if ($nilai <= $b) {
-            return $i + 1;
-        }
-    }
-    return 5;
-}
 
 // ---------------------------------------------------------------------
 // Bagian D: [kriteria A, kriteria B, lebih penting (A/B/S), nilai]
@@ -149,12 +130,7 @@ try {
     // 3. Skor 5 crane x 7 kriteria
     // -----------------------------------------------------------------
     foreach ($cranes as $kode => $d) {
-        $skor = [
-            'C1' => konversiSkor($d['ton'], $rentang['C1']),
-            'C2' => konversiSkor($d['harga'], $rentang['C2']),
-            'C3' => konversiSkor($d['jangkauan'], $rentang['C3']),
-            'C4' => konversiSkor(TAHUN_ACUAN - $d['tahun'], $rentang['C4']),
-        ] + $skorSubjektif[$kode];
+        $skor = skorKuantitatif($d['ton'], $d['harga'], $d['jangkauan'], $d['tahun']) + $skorSubjektif[$kode];
 
         foreach ($skor as $kk => $nilai) {
             Score::save($craneId[$kode], (int) $critByKode[$kk]['id'], (float) $nilai);
@@ -209,7 +185,8 @@ try {
     foreach ($criteriaIds as $idx => $cid) {
         $weights[$cid] = $ahpCalc['weights'][$idx];
     }
-    $craneList = Crane::all();
+    // Sesi kuisioner hanya memuat 5 unit hasil kuisioner, walau unit lain (seed_crane_tambahan.php) ada di basis data
+    $craneList = array_values(array_filter(Crane::all(), fn($c) => isset($cranes[$c['kode']])));
     $scoreMatrix = Score::matrix();
 
     $ahpRank = ahpRankAlternatives($craneList, $criteria, $scoreMatrix, $weights);
