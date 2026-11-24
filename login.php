@@ -28,14 +28,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Masuk';
+$bodyClass = 'mc-login';
 require __DIR__ . '/views/layout/header.php';
 ?>
-<div class="row justify-content-center mt-5">
-  <div class="col-md-4">
-    <div class="card shadow-sm">
+<div class="row justify-content-center my-auto py-4">
+  <div class="col-sm-9 col-md-6 col-lg-4">
+    <div class="card mc-login-card">
+      <div class="mc-login-top">
+        <span class="mc-brand-icon">
+          <svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 28h11M11.5 28V6M11.5 6H28M11.5 6 4 11M23 6v10"/><path d="M23 16v3.5a2.5 2.5 0 1 1-2.5 2.5"/></svg>
+        </span>
+        <h4 class="mb-1">SPK Crane</h4>
+        <small>CV Mandiri Crane &middot; AHP &amp; TOPSIS</small>
+      </div>
       <div class="card-body p-4">
-        <h4 class="mb-3 text-center">SPK Crane</h4>
-        <p class="text-center small-muted mb-4">CV Mandiri Crane - AHP &amp; TOPSIS</p>
         <?php if ($error): ?>
           <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
