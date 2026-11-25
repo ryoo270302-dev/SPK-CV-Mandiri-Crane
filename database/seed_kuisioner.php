@@ -3,10 +3,17 @@
  * Seed data hasil kuisioner penelitian (responden: Basuki, Kepala Operasional
  * Pool CV Mandiri Crane, diisi 7 November 2026).
  *
+ * Sistem memakai 5 kriteria: C1 Kapasitas angkat, C2 Biaya sewa, C3 Jangkauan
+ * kerja, C4 Mobilitas, C5 Ketersediaan unit. Kriteria Usia alat dan Kondisi alat
+ * pada kuisioner asli (7 kriteria) sudah dikeluarkan dari sistem.
+ *
  * Yang dimasukkan ke basis data:
  *   1. Data 5 unit crane (Bagian B)            -> tabel cranes
- *   2. Skor 5 crane x 7 kriteria (Bagian C, E1) -> tabel scores
+ *   2. Skor 5 crane x 5 kriteria (Bagian C, E1) -> tabel scores
  *   3. Matriks perbandingan berpasangan (Bagian D) -> sesi perhitungan AHP+TOPSIS
+ *
+ * Pemetaan dari kuisioner 7 kriteria: C1->C1, C2->C2, C3->C3, C6->C4, C7->C5.
+ * Jawaban perbandingan yang melibatkan C4 (usia) dan C5 (kondisi) tidak dipakai.
  *
  * Cara pakai (setelah database/spk_crane.sql di-import):
  *   php database/seed_kuisioner.php
@@ -57,26 +64,27 @@ $cranes = [
 ];
 
 // ---------------------------------------------------------------------
-// Bagian C: skor subjektif C5 Kondisi, C6 Mobilitas, C7 Ketersediaan
+// Bagian C: skor subjektif C4 Mobilitas dan C5 Ketersediaan
+// (di kuisioner asli bernomor C6 dan C7)
 // ---------------------------------------------------------------------
 $skorSubjektif = [
-    'CR-01' => ['C5' => 4, 'C6' => 2, 'C7' => 4],
-    'CR-02' => ['C5' => 5, 'C6' => 5, 'C7' => 5],
-    'CR-03' => ['C5' => 3, 'C6' => 1, 'C7' => 3],
-    'CR-04' => ['C5' => 4, 'C6' => 4, 'C7' => 5],
-    'CR-05' => ['C5' => 5, 'C6' => 4, 'C7' => 4],
+    'CR-01' => ['C4' => 2, 'C5' => 4],
+    'CR-02' => ['C4' => 5, 'C5' => 5],
+    'CR-03' => ['C4' => 1, 'C5' => 3],
+    'CR-04' => ['C4' => 4, 'C5' => 5],
+    'CR-05' => ['C4' => 4, 'C5' => 4],
 ];
 
 // ---------------------------------------------------------------------
 // Bagian D: [kriteria A, kriteria B, lebih penting (A/B/S), nilai]
+// 10 pasang dari 21 jawaban asli; hanya pasangan antar C1, C2, C3, C6, C7
+// yang dipertahankan, dengan C6 -> C4 dan C7 -> C5.
 // ---------------------------------------------------------------------
 $perbandingan = [
-    ['C1', 'C2', 'A', 3], ['C1', 'C3', 'A', 2], ['C1', 'C4', 'A', 7], ['C1', 'C5', 'A', 2], ['C1', 'C6', 'A', 5], ['C1', 'C7', 'A', 4],
-    ['C2', 'C3', 'B', 2], ['C2', 'C4', 'A', 3], ['C2', 'C5', 'B', 2], ['C2', 'C6', 'A', 2], ['C2', 'C7', 'A', 2],
-    ['C3', 'C4', 'A', 5], ['C3', 'C5', 'S', 1], ['C3', 'C6', 'A', 3], ['C3', 'C7', 'A', 3],
-    ['C4', 'C5', 'B', 5], ['C4', 'C6', 'B', 2], ['C4', 'C7', 'B', 3],
-    ['C5', 'C6', 'A', 3], ['C5', 'C7', 'A', 2],
-    ['C6', 'C7', 'B', 2],
+    ['C1', 'C2', 'A', 3], ['C1', 'C3', 'A', 2], ['C1', 'C4', 'A', 5], ['C1', 'C5', 'A', 4],
+    ['C2', 'C3', 'B', 2], ['C2', 'C4', 'A', 2], ['C2', 'C5', 'A', 2],
+    ['C3', 'C4', 'A', 3], ['C3', 'C5', 'A', 3],
+    ['C4', 'C5', 'B', 2],
 ];
 
 $db = getDb();
@@ -89,11 +97,21 @@ $critByKode = [];
 foreach ($criteria as $c) {
     $critByKode[$c['kode']] = $c;
 }
-foreach (['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'] as $k) {
+foreach (['C1', 'C2', 'C3', 'C4', 'C5'] as $k) {
     if (!isset($critByKode[$k])) {
         fwrite(STDERR, "Kriteria $k tidak ditemukan/aktif. Import database/spk_crane.sql dulu.\n");
         exit(1);
     }
+}
+// Pengaman: basis data lama (7 kriteria) memakai C4 = Usia alat dan C5 = Kondisi alat.
+if (stripos($critByKode['C4']['nama'], 'mobilitas') === false || stripos($critByKode['C5']['nama'], 'ketersediaan') === false) {
+    fwrite(STDERR, "Kriteria di basis data masih skema lama (C4 = {$critByKode['C4']['nama']}, C5 = {$critByKode['C5']['nama']}).\n"
+        . "Import ulang database/spk_crane.sql atau hapus kriteria Usia alat dan Kondisi alat, lalu ubah kode Mobilitas menjadi C4 dan Ketersediaan unit menjadi C5.\n");
+    exit(1);
+}
+if (count($criteria) !== 5) {
+    fwrite(STDERR, "Jumlah kriteria aktif harus 5, ditemukan " . count($criteria) . ".\n");
+    exit(1);
 }
 
 $db->beginTransaction();
@@ -127,10 +145,10 @@ try {
     }
 
     // -----------------------------------------------------------------
-    // 3. Skor 5 crane x 7 kriteria
+    // 3. Skor 5 crane x 5 kriteria
     // -----------------------------------------------------------------
     foreach ($cranes as $kode => $d) {
-        $skor = skorKuantitatif($d['ton'], $d['harga'], $d['jangkauan'], $d['tahun']) + $skorSubjektif[$kode];
+        $skor = skorKuantitatif($d['ton'], $d['harga'], $d['jangkauan']) + $skorSubjektif[$kode];
 
         foreach ($skor as $kk => $nilai) {
             Score::save($craneId[$kode], (int) $critByKode[$kk]['id'], (float) $nilai);
