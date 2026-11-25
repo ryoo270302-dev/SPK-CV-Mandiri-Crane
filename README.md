@@ -59,15 +59,26 @@ lalu buka `http://localhost:8000/login.php`. Cara ini tetap membutuhkan MySQL
 | Bagian kuisioner | Masuk ke | Isi |
 |---|---|---|
 | B | `cranes` | 5 unit crane (kapasitas, tahun, harga sewa, jangkauan) |
-| C + E1 | `scores` | 35 skor (5 crane x 7 kriteria). C5-C7 dari penilaian responden; C1-C4 dikonversi dari spesifikasi memakai rentang E1 yang sudah dikonfirmasi |
-| D | sesi perhitungan | 21 perbandingan berpasangan, lalu AHP + TOPSIS dijalankan otomatis |
+| C + E1 | `scores` | 25 skor (5 crane x 5 kriteria). C4 Mobilitas dan C5 Ketersediaan dari penilaian responden; C1-C3 dikonversi dari spesifikasi memakai rentang E1 yang sudah dikonfirmasi |
+| D | sesi perhitungan | 10 perbandingan berpasangan antar 5 kriteria, lalu AHP + TOPSIS dijalankan otomatis |
+
+Sistem memakai **5 kriteria**: C1 Kapasitas angkat, C2 Biaya sewa, C3 Jangkauan
+kerja, C4 Mobilitas, C5 Ketersediaan unit. Kriteria Usia alat dan Kondisi alat
+pada kuisioner asli (7 kriteria) dikeluarkan; jawaban kuisioner untuk C6 dan C7
+dipetakan menjadi C4 dan C5, sedangkan perbandingan yang melibatkan usia dan
+kondisi tidak dipakai. Kolom `tahun` pada data crane tetap disimpan sebagai
+spesifikasi unit, bukan kriteria.
+
+Jika basis data Anda masih memakai skema 7 kriteria, import ulang
+`database/spk_crane.sql` sebelum menjalankan seed (skrip akan berhenti dengan
+pesan bila C4 dan C5 belum berupa Mobilitas dan Ketersediaan unit).
 
 Skrip ini idempoten (aman diulang) dan memakai mesin hitung aplikasi sendiri.
-Usia alat dihitung dari tahun acuan 2026. Nama unit yang sudah ada di basis
-data tidak ditimpa.
+Nama unit yang sudah ada di basis data tidak ditimpa.
 
-Hasil dengan data kuisioner: CR = 0,0122 (konsisten); TOPSIS peringkat 1 = CR-03
-XCMG 80T (V = 0,7329), AHP peringkat 1 = CR-03 juga; Spearman = 0,9000.
+Hasil dengan data kuisioner (5 kriteria): bobot C1 0,4224; C2 0,1506; C3 0,2522;
+C4 0,0727; C5 0,1020. CR = 0,0166 (konsisten). Peringkat AHP dan TOPSIS sama:
+CR-03 XCMG 80T (TOPSIS V = 0,7716), CR-01, CR-04, CR-02, CR-05; Spearman = 1,0000.
 
 ## Akun Default
 

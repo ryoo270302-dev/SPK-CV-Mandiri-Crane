@@ -72,10 +72,8 @@ INSERT INTO criteria (kode, nama, tipe, satuan, keterangan, aktif, urutan) VALUE
 ('C1', 'Kapasitas angkat', 'benefit', 'ton', 'Kemampuan angkat maksimum crane', 1, 1),
 ('C2', 'Biaya sewa', 'cost', 'Rp/hari', 'Biaya sewa per satuan waktu', 1, 2),
 ('C3', 'Jangkauan kerja', 'benefit', 'meter', 'Panjang jangkauan kerja (boom)', 1, 3),
-('C4', 'Usia alat', 'cost', 'tahun', 'Semakin tua usia alat, penilaian semakin rendah', 1, 4),
-('C5', 'Kondisi alat', 'benefit', 'skor 1-5', 'Kondisi teknis dan kelayakan operasional', 1, 5),
-('C6', 'Mobilitas', 'benefit', 'skor 1-5', 'Kemudahan pemindahan unit antar lokasi', 1, 6),
-('C7', 'Ketersediaan unit', 'benefit', 'skor 1-5', 'Ketersediaan unit saat dibutuhkan', 1, 7);
+('C4', 'Mobilitas', 'benefit', 'skor 1-5', 'Kemudahan pemindahan unit antar lokasi', 1, 4),
+('C5', 'Ketersediaan unit', 'benefit', 'skor 1-5', 'Ketersediaan unit saat dibutuhkan', 1, 5);
 
 -- ---------------------------------------------------------------------
 -- scores  (penilaian setiap crane terhadap setiap kriteria, skala 1-5)

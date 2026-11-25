@@ -33,7 +33,7 @@ $icoCheck = $icon('<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>');
   <span class="mc-eyebrow">CV Mandiri Crane &middot; Pusat Rental Crane</span>
   <h1>Pilih crane terbaik dengan perhitungan yang objektif</h1>
   <p>Sistem pendukung keputusan yang membandingkan unit crane memakai metode AHP dan TOPSIS,
-     berdasarkan kapasitas, biaya, jangkauan, usia, kondisi, mobilitas, dan ketersediaan unit.</p>
+     berdasarkan kapasitas, biaya, jangkauan, mobilitas, dan ketersediaan unit.</p>
   <div class="d-flex flex-wrap gap-2">
     <?php if (isAdmin()): ?>
       <a href="<?= url('ahp/pairwise.php') ?>" class="btn btn-primary btn-lg">Hitung Rekomendasi</a>
